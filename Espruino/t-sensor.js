@@ -1,30 +1,29 @@
-var btn1 = require('@amperka/button')
-  .connect(BTN1, {
-    normalSignal: 0
-  });
+function TemperatureSensor(options) {
+	this.vIn = options.vIn || 5; //default in voltage
+	this.r = options.r || 10000; // second resistor
 
-function Temp(powerPin, signalPin){
-  this.powerPin = powerPin;
-  this.signalPin = signalPin;
-  
-  this.init();
+	this.powerPin = options.powerPin;
+	this.signalPin = options.signalPin;
+
+	if (options.initializePins) {
+		this.initializePins();
+	}
 }
 
-Temp.prototype.init = function(){
-  this.powerPin.mode('output');
-  this.powerPin.write(false);
-  
-  this.signalPin.mode('analog');
+TemperatureSensor.prototype.initializePins = function () {
+	this.powerPin.mode('output');
+	this.powerPin.write(false);
+
+	this.signalPin.mode('analog');
 };
 
-Temp.prototype.read = function(){
-  this.powerPin.write(true);
-  console.log(analogRead(this.signalPin));
-  this.powerPin.write(false);
+TemperatureSensor.prototype.read = function () {
+	this.powerPin.write(true);
+	var result = analogRead(this.signalPin);
+	this.powerPin.write(false);
+	return result;
 };
 
-var sensor = new Temp(P13, A0);
-
-btn1.on('release', function() {
-  sensor.read();
-});
+exports.connect = function (options) {
+	return new TemperatureSensor(options);
+};
