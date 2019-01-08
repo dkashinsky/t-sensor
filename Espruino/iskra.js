@@ -8,5 +8,6 @@ var sensor = require('t-sensor').connect({
 });
 
 btn1.on('release', function () {
-	console.log(sensor.read());
+	var temperature = sensor.getTemperature();
+	console.log(`${temperature.toFixed(2)} C`);
 });
