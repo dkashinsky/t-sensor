@@ -24,6 +24,12 @@ TemperatureSensor.prototype.read = function () {
 	return result;
 };
 
+TemperatureSensor.prototype.getResistence = function () {
+	var vOut = this.read() * this.vIn;
+	var rT = (this.vIn - vOut) * this.r / vOut;
+	return rT;
+};
+
 exports.connect = function (options) {
 	return new TemperatureSensor(options);
 };
