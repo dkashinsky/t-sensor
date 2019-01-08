@@ -1,15 +1,18 @@
+//constructor function. initializes new sensor
 function TemperatureSensor(options) {
 	this.vIn = options.vIn || 5; //default in voltage
-	this.r = options.r || 10000; // second resistor
+	this.r = options.r || 10000; // resistor
 
-	this.powerPin = options.powerPin;
-	this.signalPin = options.signalPin;
+	this.powerPin = options.powerPin; //pin to power up the sensor
+	this.signalPin = options.signalPin; //pin to read data. 
 
+	//initialize pins if option provided and value is truthy
 	if (options.initializePins) {
 		this.initializePins();
 	}
 }
 
+//pins initialization
 TemperatureSensor.prototype.initializePins = function () {
 	this.powerPin.mode('output');
 	this.powerPin.write(false);
@@ -17,6 +20,7 @@ TemperatureSensor.prototype.initializePins = function () {
 	this.signalPin.mode('analog');
 };
 
+//read sensor data. return data is from 0.0 to 1.0
 TemperatureSensor.prototype.read = function () {
 	this.powerPin.write(true);
 	var result = analogRead(this.signalPin);
@@ -24,6 +28,7 @@ TemperatureSensor.prototype.read = function () {
 	return result;
 };
 
+//as far as sensor is a simple voltage divider, we can simply calculate thermistor resistance
 TemperatureSensor.prototype.getResistance = function () {
 	var vOut = this.read() * this.vIn;
 	var rT = (this.vIn - vOut) * this.r / vOut;
@@ -95,6 +100,7 @@ function interpolate(x0, y0, x1, y1, x) {
 	return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
 }
 
+//gets temperature in celcius
 TemperatureSensor.prototype.getTemperature = function () {
 	var r = this.getResistance();
 	var segment = getReferenceInterval(r);
@@ -105,6 +111,7 @@ TemperatureSensor.prototype.getTemperature = function () {
 	return null;
 };
 
+//convention method to import module and instantiate sensor object
 exports.connect = function (options) {
 	return new TemperatureSensor(options);
 };
